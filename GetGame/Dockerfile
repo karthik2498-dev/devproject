@@ -4,7 +4,7 @@ FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # Copy the pom.xml and download dependencies (leverages Docker cache)
-COPY pom.xml .
+COPY GetGame/pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy the rest of the source code
