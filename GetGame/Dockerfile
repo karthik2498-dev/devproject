@@ -8,7 +8,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy the rest of the source code
-COPY src ./src
+COPY GetGame/src ./src
 
 # Build the JAR
 RUN mvn clean package -DskipTests
