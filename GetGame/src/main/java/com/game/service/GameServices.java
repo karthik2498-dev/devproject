@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,16 +26,22 @@ public class GameServices {
 	
 	private GameRepo gamerepo;
 	private GameList gamelist;
+	private final KafkaTemplate<String, String> kafkaTemplate;
+	private final String topic = "test-topic";
 
-	 public GameServices(GameRepo gamerepo, GameList gamelist) {
+	 public GameServices(GameRepo gamerepo, GameList gamelist, KafkaTemplate<String, String> kafkaTemplate) {
 		this.gamerepo=gamerepo;
 		this.gamelist=gamelist;
+		this.kafkaTemplate = kafkaTemplate;
 	}
 
 
 	 private static final String API_URL1 = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/";
 	 private static final String API_URL2 ="https://store.steampowered.com/api/appdetails?appids=";
-	 
+
+	    public void send(String message) {
+	        kafkaTemplate.send(topic, message);
+	    }
 	 
 	 
 	 	//@Scheduled(fixedRate = 120000) // every 2 minutes
@@ -72,18 +80,14 @@ public class GameServices {
 	        
 	        List<Game> games = new ArrayList<>();
 	        for (Map<String, Object> gameData : gamesRaw) {
-	        	 System.out.println("inside for loop");
 	            Game game = new Game();
 	            game.setAppId((int) gameData.get("appid"));
 	            game.setPlayers((int) gameData.get("rank"));
 	            game.setName("AppID: " + game.getAppId()); // You can resolve actual names with another API call
-	            //games.add(game);
 	            SaveGameList(game);
 	        }
-	        //SaveAllGameList(games);
-	        
 	        System.out.println("End : "+currentTime);
-	        //return games;
+	       
 	    }
 	 	
 	 	public String SaveGameList(Game game){
@@ -100,9 +104,7 @@ public class GameServices {
 			   }
 			  
 		   }
-	   	   
-	   
-	   
+   
 	   public String MostPlayGame(String appid) throws JsonMappingException, JsonProcessingException {
 	   		RestTemplate restTemplate = new RestTemplate();
 	   		ObjectMapper objectMapper = new ObjectMapper();
@@ -120,6 +122,32 @@ public class GameServices {
              }
              
   }
+	   
+	   public int MostPlayedgamID() {   
+		   Game game=(Game) gamerepo.findGameWithMostPlayers();
+		   int result=game.getAppId();
+		   return result;	   
+	   }
+	   
+	   public String savegame(Game game) {
+		   try {
+		   GameList list= new GameList();
+		   list.setAppId(game.getAppId());
+		   list.setName(game.getName());
+		   list.setPlayers(game.getPlayers());
+		   gamerepo.save(list);
+		   }
+		   catch(Exception e) {
+			   e.getMessage();
+			   return "failed to save";
+		   }
+		   return "successfully updated";
+	   }
+	   
+	   @KafkaListener(topics = "test-topic", groupId = "my-group")
+	    public void listen(String message) {
+	        System.out.println("Received message: " + message);
+	    }
 
 	
 }
