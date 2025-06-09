@@ -5,8 +5,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class Game {
 	private String name;
-    private int appId;
+	private int appId;
     private int players;
+    
+    
+    public Game(String name, int appId, int players) {
+  		this.name = name;
+  		this.appId = appId;
+  		this.players = players;
+  	}
+    
+    
+	public Game() {
+		// TODO Auto-generated constructor stub
+	}
+
+
 	public String getName() {
 		return name;
 	}
