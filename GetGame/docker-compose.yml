@@ -2,13 +2,6 @@ version: '3.8'
 
 services:
 
-  Getgame-app:
-    image: karthik24981998/getgame:1.2
-    container_name: getgame-app
-    restart: always
-    ports:
-      - "1155:1155"
-
   mysql:
     image: mysql
     container_name: mysql
@@ -50,6 +43,13 @@ services:
       KAFKA_CFG_LOG_DIRS: "/bitnami/kafka/data"
     volumes:
       - kafka_data:/bitnami/kafka
+
+  Getgame-app:
+    image: karthik24981998/getgame:1.2
+    container_name: getgame-app
+    restart: always
+    ports:
+      - "1155:1155"
 
 volumes:
   mysql-data:
