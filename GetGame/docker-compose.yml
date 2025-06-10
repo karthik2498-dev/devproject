@@ -34,7 +34,7 @@ services:
     ports:
       - "8080:80"
 
- kafka:
+  kafka:
     image: bitnami/kafka:3.6
     container_name: kafka-kraft
     ports:
