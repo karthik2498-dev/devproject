@@ -35,7 +35,7 @@ public class GetGameController {
 	    
 	   
 	    @PostMapping("/publish")
-	    public String publish(@RequestParam String message) {
+	    public String publish(@RequestParam(name = "message") String message) {
 	    	Service.send(message);
 	        return "Message sent: " + message;
 	    }
