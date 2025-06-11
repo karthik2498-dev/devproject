@@ -22,24 +22,16 @@ import com.game.service.GameServices;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@RestController
+@RestController("/api")
 public class GetGameController {
 	
 	
 	 private final GameServices Service;
 
-	    public GetGameController(GameServices Service) {
+	 public GetGameController(GameServices Service) {
 	        this.Service = Service;
 	    }
-	    
-	    
-	   
-	    @PostMapping("/publish")
-	    public String publish(@RequestParam(name = "message") String message) {
-	    	Service.send(message);
-	        return "Message sent: " + message;
-	    }
-	
+
 	@GetMapping("/GetGameNameByID")
 	@Tag(name = "Get GetGameNameByID", description = "Fetches the GetGameNameByID")
 	public String GetGameNameByID(@RequestParam("Id") String Id) throws JsonMappingException, JsonProcessingException {

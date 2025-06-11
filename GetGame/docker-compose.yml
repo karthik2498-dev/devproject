@@ -50,6 +50,9 @@ services:
     restart: always
     ports:
       - "1155:1155"
+    environment:
+      - SERVER_PORT=1155
+
 
 volumes:
   mysql-data:
