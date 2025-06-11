@@ -25,53 +25,18 @@ public class GameServices {
 	
 	
 	private GameRepo gamerepo;
-	private GameList gamelist;
-	private final KafkaTemplate<String, String> kafkaTemplate;
-	private final String topic = "test-topic";
 
-	 public GameServices(GameRepo gamerepo, GameList gamelist, KafkaTemplate<String, String> kafkaTemplate) {
+	 public GameServices(GameRepo gamerepo, GameList gamelist) {
 		this.gamerepo=gamerepo;
-		this.gamelist=gamelist;
-		this.kafkaTemplate = kafkaTemplate;
 	}
 
 
 	 private static final String API_URL1 = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/";
 	 private static final String API_URL2 ="https://store.steampowered.com/api/appdetails?appids=";
-
-	    public void send(String message) {
-	        kafkaTemplate.send(topic, message);
-	    }
 	 
-	 
-	 	//@Scheduled(fixedRate = 120000) // every 2 minutes
-	    public void fetchAndStoreGames() {
-		 RestTemplate restTemplate = new RestTemplate();
-	        String url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/";
-	        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
-	        JsonNode apps = response.getBody().path("applist").path("apps");
-
-	        List<Game> games = new ArrayList<>();
-
-	        for (JsonNode app : apps) {
-	            Long appid = app.path("appid").asLong();
-	            String name = app.path("name").asText();
-
-	            Game game = new Game();
-	            //game.setAppid(appid);
-	            game.setName(name);
-	            games.add(game);
-	            System.out.println("Game : "+name+" "+game);
-	        }
-
-	        //gameRepository.saveAll(games);
-	        System.out.println("Saved " + games.size() + " games");
-	    }
-	 	
 	 	@Scheduled(fixedRate = 120000)
 	    public void getTopGames() {
-	 		 LocalTime currentTime = LocalTime.now();
-	 		System.out.println("Started : "+currentTime);
+	 		LocalTime currentTime = LocalTime.now();
 	        RestTemplate restTemplate = new RestTemplate();
 	        Map response = restTemplate.getForObject(API_URL1, Map.class);
 	        List<Map<String, Object>> gamesRaw = (List<Map<String, Object>>) ((Map) response.get("response")).get("ranks");
@@ -86,7 +51,6 @@ public class GameServices {
 	            game.setName("AppID: " + game.getAppId()); // You can resolve actual names with another API call
 	            SaveGameList(game);
 	        }
-	        System.out.println("End : "+currentTime);
 	       
 	    }
 	 	
