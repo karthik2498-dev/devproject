@@ -19,10 +19,11 @@ public class KafkaService {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 
-
 	@KafkaListener(topics = "test-topic", groupId = "my-group")
     public void listen(String message) {
         System.out.println("Received message: " + message);
     }
-
+	
 }
+
+
