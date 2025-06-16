@@ -1,24 +1,38 @@
 <configuration>
+  <!-- Resolve spring.application.name -->
+  <springProperty name="SERVICE_NAME" source="spring.application.name"/>
+
+  <!-- Include base Spring Boot logging config -->
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+  <!-- LOGSTASH appender for structured JSON logs -->
   <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
     <destination>logstash:5000</destination>
-    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-      <providers>
-        <timestamp />
-        <logLevel />
-        <loggerName />
-        <pattern>
-          <pattern>
-            {
-              "message": "%message",
-              "thread": "%thread"
-            }
-          </pattern>
-        </pattern>
-      </providers>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <customFields>{"serviceName":"${SERVICE_NAME}"}</customFields>
     </encoder>
   </appender>
 
+  <!-- Suppress noisy logs from frameworks -->
+  <logger name="org.springframework" level="WARN" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+  </logger>
+
+  <logger name="org.apache.kafka" level="ERROR" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+  </logger>
+
+  <logger name="org.elasticsearch" level="ERROR" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+  </logger>
+
+  <!-- Send only your app logs (adjust package name accordingly) -->
+  <logger name="com.game" level="INFO">
+    <appender-ref ref="LOGSTASH"/>
+  </logger>
+
+  <!-- Root logger sends to console only -->
   <root level="INFO">
-    <appender-ref ref="LOGSTASH" />
+    <appender-ref ref="CONSOLE"/>
   </root>
 </configuration>
