@@ -2,6 +2,8 @@ package com.game;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +24,11 @@ import com.game.service.GameServices;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@RestController("/api")
+@RestController
+@RequestMapping("/api")
 public class GetGameController {
 	
+	 private static final Logger logger = LoggerFactory.getLogger(GetGameController.class);
 	
 	 private final GameServices Service;
 
@@ -32,6 +36,14 @@ public class GetGameController {
 	        this.Service = Service;
 	    }
 
+	 @GetMapping("/hello")
+	 @Tag(name = "hello", description = "testhello")
+	 public String hello() {
+	    logger.info("Received request on /hello");
+	    return "Hello from Spring Boot!";
+	  }
+	 
+	 
 	@GetMapping("/GetGameNameByID")
 	@Tag(name = "Get GetGameNameByID", description = "Fetches the GetGameNameByID")
 	public String GetGameNameByID(@RequestParam("Id") String Id) throws JsonMappingException, JsonProcessingException {
